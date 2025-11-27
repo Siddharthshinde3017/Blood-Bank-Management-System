@@ -1,0 +1,72 @@
+blood_bank/
+│── app.py
+│── config.py
+│── requirements.txt
+│── run.py
+│
+│── instance/
+│   └── config.py        # For secret keys (ignored by Git)
+│
+│── migrations/          # Auto-created if you use Flask-Migrate
+│
+│── models/
+│   ├── __init__.py
+│   ├── admin.py
+│   ├── donor.py
+│   ├── patient.py
+│   ├── blood_stock.py
+│   ├── blood_request.py
+│   └── camp.py
+│
+│── routes/
+│   ├── __init__.py
+│   ├── admin_routes.py
+│   ├── donor_routes.py
+│   ├── patient_routes.py
+│   ├── auth_routes.py
+│   └── public_routes.py
+│
+│── utils/
+│   ├── email_service.py      # Flask-Mail config
+│   ├── pdf_generator.py      # reportlab PDFs
+│   ├── validators.py         # email, date, group validation
+│   └── decorators.py         # login_required, role_required
+│
+│── templates/
+│   ├── base.html
+│   │
+│   ├── admin/
+│   │   ├── dashboard.html
+│   │   ├── manage_donors.html
+│   │   ├── manage_patients.html
+│   │   ├── manage_stock.html
+│   │   ├── manage_requests.html
+│   │   └── camps.html
+│   │
+│   ├── donor/
+│   │   ├── dashboard.html
+│   │   ├── register.html
+│   │   ├── donate.html
+│   │   └── history.html
+│   │
+│   ├── patient/
+│   │   ├── dashboard.html
+│   │   ├── request_blood.html
+│   │   ├── request_status.html
+│   │   └── availability.html
+│   │
+│   └── auth/
+│       ├── login.html
+│       └── register.html
+│
+│── static/
+│   ├── css/
+│   │   └── styles.css
+│   ├── js/
+│   │   └── main.js
+│   └── images/
+│       ├── logo.png
+│       └── donors/
+│
+└── database/
+    └── bloodbank.db  (sqlite) OR empty for MySQL
