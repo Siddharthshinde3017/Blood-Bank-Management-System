@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    {% extends "base.html" %}
+{% block content %}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+<style>
+.hero {
+    height: 80vh;
+    background: linear-gradient(to right, rgba(220,20,60,0.7), rgba(139,0,0,0.7)),
+                url("{{ url_for('static', filename='images/blood-bg.jpg') }}");
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    color: #fff;
+}
+.hero h1 {
+    font-size: 3.2rem;
+    font-weight: 700;
+}
+.feature-card {
+    transition: 0.3s;
+}
+.feature-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+}
+</style>
+
+<!-- Hero Section -->
+<div class="hero">
+    <div class="container">
+        <h1>Donate Blood, Save Lives ❤️</h1>
+        <p class="mt-3 fs-5">Join our mission and help those in need. Your small contribution can save someone’s life.</p>
+        <a href="{{ url_for('register') }}" class="btn btn-light btn-lg mt-3">
+            Become a Donor
+        </a>
+    </div>
+</div>
+
+<!-- Features Section -->
+<div class="container my-5">
+    <h2 class="text-center fw-bold mb-4">Our Services</h2>
+
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card p-4 text-center feature-card shadow-sm">
+                <i class="fas fa-hand-holding-medical fa-3x text-danger mb-3"></i>
+                <h4>Register as Donor</h4>
+                <p>Join our trusted donor network and save lives with your contribution.</p>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card p-4 text-center feature-card shadow-sm">
+                <i class="fas fa-heartbeat fa-3x text-danger mb-3"></i>
+                <h4>Check Blood Availability</h4>
+                <p>Search and request blood units from our verified blood banks.</p>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card p-4 text-center feature-card shadow-sm">
+                <i class="fas fa-ambulance fa-3x text-danger mb-3"></i>
+                <h4>Emergency Support</h4>
+                <p>24/7 emergency helpline for urgent blood requirements.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+</body>
+</html>

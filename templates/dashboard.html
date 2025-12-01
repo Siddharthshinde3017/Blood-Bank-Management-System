@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard | Blood Bank</title>
+
+    <!-- BOOTSTRAP -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FONT AWESOME ICONS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+    <style>
+        /* BODY & NAVBAR */
+        body {
+            background: #f7f7f7;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .navbar {
+            background: linear-gradient(90deg, #b30000, #ff1a1a) !important;
+        }
+
+        .navbar-brand, .nav-link, .dropdown-toggle {
+            color: white !important;
+        }
+
+        .nav-link:hover {
+            text-decoration: underline;
+        }
+
+        /* HERO BANNER */
+        .hero-banner {
+            background-image: url("/static/images/blood-bg.jpg");
+            background-size: cover;
+            background-position: center;
+            height: 250px;
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-banner-overlay {
+            background: rgba(0, 0, 0, 0.5);
+            height: 100%;
+            border-radius: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 28px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        /* DASHBOARD CARDS */
+        .dashboard-card {
+            border-radius: 20px;
+            transition: 0.3s;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            color: white;
+        }
+
+        .dashboard-card .card-body {
+            z-index: 2;
+            position: relative;
+        }
+
+        /* Gradient background for cards */
+        .dashboard-card.blood-red { background: linear-gradient(135deg, #ff4d4d, #b30000); }
+        .dashboard-card.blood-pink { background: linear-gradient(135deg, #ff9999, #ff4d4d); }
+        .dashboard-card.blood-purple { background: linear-gradient(135deg, #a64dff, #ff4dff); }
+        .dashboard-card.blood-orange { background: linear-gradient(135deg, #ffb84d, #ff4d1a); }
+
+        /* Hover effects */
+        .dashboard-card:hover {
+            transform: translateY(-10px) scale(1.03);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.3);
+        }
+
+        /* Stat icon style */
+        .stat-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+            opacity: 0.8;
+        }
+
+        /* QUICK ACTIONS CARDS */
+        .quick-card {
+            border-radius: 20px;
+            transition: 0.3s;
+            cursor: pointer;
+            color: white;
+            overflow: hidden;
+        }
+
+        .quick-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.25);
+        }
+
+        .quick-card.bg-request { background: linear-gradient(135deg, #ff4d4d, #b30000); }
+        .quick-card.bg-donate { background: linear-gradient(135deg, #ff6666, #ff1a1a); }
+        .quick-card.bg-stock { background: linear-gradient(135deg, #ff9933, #ff4d1a); }
+    </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-dark px-4 mb-4">
+    <a class="navbar-brand fw-bold" href="#">BloodBank+</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="menu">
+         <ul class="navbar-nav ms-auto">
+            <li class="nav-item"><a href="/profile" class="btn btn-light ms-3">Profile</a></li>
+        </ul>
+        <ul class="navbar-nav ms-auto">
+            <li class="nav-item"><a href="/logout" class="btn btn-light ms-3">Logout</a></li>
+        </ul>
+    </div>
+</nav>
+
+<div class="container">
+
+    <!-- HERO BANNER -->
+    <div class="hero-banner mb-4">
+        <div class="hero-banner-overlay">
+            Welcome, {{ user['name'] }} ❤️<br>
+            You are a valuable donor!
+        </div>
+    </div>
+
+    <!-- STATS CARDS -->
+    <div class="row g-4 text-center mb-4">
+
+        <div class="col-12 col-md-6 col-lg-3">
+            <div class="dashboard-card blood-red h-100 d-flex flex-column justify-content-center align-items-center p-4">
+                <i class="fas fa-tint stat-icon"></i>
+                <h5>Your Blood Group</h5>
+                <p class="fw-bold fs-5">{{ user['blood_group'] }}</p>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-6 col-lg-3">
+            <div class="dashboard-card blood-pink h-100 d-flex flex-column justify-content-center align-items-center p-4">
+                <i class="fas fa-calendar-day stat-icon"></i>
+                <h5>Last Donation</h5>
+                <p class="fw-bold fs-5">{{ user['last_donation'] if user['last_donation'] else 'N/A' }}</p>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-6 col-lg-3">
+            <div class="dashboard-card blood-purple h-100 d-flex flex-column justify-content-center align-items-center p-4">
+                <i class="fas fa-heart stat-icon"></i>
+                <h5>Eligible To Donate?</h5>
+                <p class="fw-bold fs-5 text-light">Yes</p>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-6 col-lg-3">
+            <div class="dashboard-card blood-orange h-100 d-flex flex-column justify-content-center align-items-center p-4">
+                <i class="fas fa-hospital stat-icon"></i>
+                <h5>Nearby Camps</h5>
+                <p class="fw-bold fs-6">3 Available</p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- QUICK ACTIONS -->
+    <h4 class="mb-3">Quick Actions</h4>
+    <div class="row g-4 mb-5">
+
+        <div class="col-12 col-md-4">
+            <div class="quick-card bg-request h-100 d-flex flex-column justify-content-between p-4 text-center">
+                <h5>Request Blood</h5>
+                <p>Need urgent blood? Raise a request instantly.</p>
+                <a href="/request-blood" class="btn btn-light px-4">Request Now</a>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-4">
+            <div class="quick-card bg-donate h-100 d-flex flex-column justify-content-between p-4 text-center">
+                <h5>Become Donor</h5>
+                <p>Help save lives by registering as a donor.</p>
+                <a href="/donate" class="btn btn-light px-4">Donate Now</a>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-4">
+            <div class="quick-card bg-stock h-100 d-flex flex-column justify-content-between p-4 text-center">
+                <h5>Check Availability</h5>
+                <p>See which blood units are available.</p>
+                <a href="/blood-stock" class="btn btn-light px-4">View Stock</a>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- BOOTSTRAP JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

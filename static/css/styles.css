@@ -1,0 +1,16 @@
+.hero-section {
+    height: 80vh;
+    background-image: url("/static/images/blood-bg.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+
+.card {
+    border-radius: 15px;
+}
+
+.btn-danger {
+    border-radius: 25px;
+}

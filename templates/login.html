@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    {% extends "base.html" %}
+{% block content %}
+
+<div class="container mt-5">
+    <div class="card px-4 py-3 shadow mx-auto" style="max-width: 400px;">
+        <h3 class="text-center text-danger fw-bold">Login</h3>
+
+        <form method="POST">
+            <div class="mb-3">
+                <label class="form-label">Email ID</label>
+                <input type="email" name="email" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Password</label>
+                <input type="password" name="password" class="form-control" required>
+            </div>
+
+            <button class="btn btn-danger w-100">Login</button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+</body>
+</html>

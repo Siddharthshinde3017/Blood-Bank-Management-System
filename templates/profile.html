@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    {% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>My Profile</h2>
+    <div class="card p-4 shadow mt-3">
+        <p><strong>Name:</strong> {{ user['name'] }}</p>
+        <p><strong>Email:</strong> {{ user['email'] }}</p>
+        <p><strong>Blood Group:</strong> {{ user['blood_group'] }}</p>
+        <p><strong>Mobile:</strong> {{ user['mobile'] }}</p>
+    </div>
+</div>
+{% endblock %}
+
+</body>
+</html>
