@@ -3,21 +3,39 @@ import sqlite3
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 from functools import wraps
+import os
 
 app = Flask(__name__)
-app.secret_key = "bloodbank_secret_key"   # session secret key
+app.secret_key = "bloodbank_secret_key"  # session secret key
+
+DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "blood_bank.db")
 
 
 # ---------- DATABASE CONNECTION ----------
 def get_db():
-    import os
-    
-    db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "blood_bank.db")
-    print("🔥 Flask is using this database:", db_path)
-
-    conn = sqlite3.connect(db_path)
+    conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
+
+
+# ---------- LOGIN DECORATORS ----------
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if "user_id" not in session:
+            flash("Please login first", "warning")
+            return redirect(url_for("login"))
+        return f(*args, **kwargs)
+    return decorated_function
+
+def admin_login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not session.get("admin_logged_in"):
+            flash("Please login as admin first", "warning")
+            return redirect(url_for("admin_login"))
+        return f(*args, **kwargs)
+    return decorated_function
 
 
 # ---------- HOME PAGE ----------
@@ -48,11 +66,9 @@ def register():
             conn.commit()
             flash("✅ Registration successful! Please login.", "success")
             return redirect(url_for("login"))
-
         except sqlite3.IntegrityError:
             flash("❌ Email already exists. Try another.", "danger")
             return redirect(url_for("register"))
-
         finally:
             conn.close()
 
@@ -92,42 +108,22 @@ def user_dashboard():
     return render_template("dashboard.html", user=user)
 
 
-# ---------- BLOOD REQUEST ----------
-@app.route("/request-blood", methods=["GET", "POST"])
-@login_required
-def request_blood():
-    if request.method == "POST":
-        blood_group = request.form["blood_group"]
-        units = request.form["units"]
-        request_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-        conn = get_db()
-        conn.execute(
-            "INSERT INTO blood_requests(donor_id, blood_group, units, request_date) VALUES (?, ?, ?, ?)",
-            (session["user_id"], blood_group, units, request_date)
-        )
-        conn.commit()
-        conn.close()
-
-        flash("✅ Blood request submitted successfully!", "success")
-        return redirect(url_for("user_dashboard"))
-
-    return render_template("request_blood.html")
-
-
 # ---------- DONATE BLOOD ----------
 @app.route("/donate", methods=["GET", "POST"])
 @login_required
 def donate():
     if request.method == "POST":
-        units = request.form["units"]
+        units = int(request.form["units"])
         location = request.form["location"]
         donation_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         conn = get_db()
+        donor = conn.execute("SELECT blood_group FROM donors WHERE id = ?", (session["user_id"],)).fetchone()
+        blood_group = donor["blood_group"]
+
         conn.execute(
-            "INSERT INTO donation_history(donor_id, donation_date, units, location) VALUES(?,?,?,?)",
-            (session["user_id"], donation_date, units, location)
+            "INSERT INTO donation_history(donor_id, donation_date, units, location, blood_group) VALUES(?,?,?,?,?)",
+            (session["user_id"], donation_date, units, location, blood_group)
         )
         conn.execute("UPDATE donors SET last_donation = ? WHERE id = ?", (donation_date, session["user_id"]))
         conn.commit()
@@ -150,7 +146,7 @@ def blood_stock():
         GROUP BY blood_group
     """).fetchall()
     conn.close()
-    return render_template("blood_stock.html", stock=stock)
+    return render_template("blood_stock.html", stock=stock, current_year=datetime.utcnow().year)
 
 
 # ---------- PROFILE ----------
@@ -217,19 +213,32 @@ def admin_dashboard():
 @app.route("/admin/manage-donors")
 @admin_login_required
 def manage_donors():
-    return render_template("manage_donors.html")
+    conn = get_db()
+    donors = conn.execute("SELECT * FROM donors").fetchall()
+    conn.close()
+    return render_template("manage_donors.html", donors=donors)
 
 
 @app.route("/admin/manage-requests")
 @admin_login_required
 def manage_requests():
-    return render_template("manage_requests.html")
+    conn = get_db()
+    requests = conn.execute("SELECT r.*, d.name, d.blood_group FROM blood_requests r JOIN donors d ON r.donor_id=d.id").fetchall()
+    conn.close()
+    return render_template("manage_requests.html", requests=requests)
 
 
 @app.route("/admin/manage-stock")
 @admin_login_required
 def manage_stock():
-    return render_template("manage_stock.html")
+    conn = get_db()
+    stock = conn.execute("""
+        SELECT blood_group, SUM(units) AS total_units
+        FROM donation_history
+        GROUP BY blood_group
+    """).fetchall()
+    conn.close()
+    return render_template("manage_stock.html", stock=stock)
 
 
 # ---------- ADMIN LOGOUT ----------
@@ -240,10 +249,44 @@ def admin_logout():
     flash("Admin logged out successfully!", "info")
     return redirect(url_for("admin_login"))
 
+# ---------- RAISE BLOOD REQUEST ----------
+@app.route("/request-blood", methods=["GET", "POST"])
+@login_required
+def request_blood():
+    if request.method == "POST":
+        blood_group = request.form["blood_group"]
+        units = request.form["units"]
+        request_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        conn = get_db()
+        conn.execute(
+            "INSERT INTO blood_requests(donor_id, blood_group, units, request_date, status) VALUES (?, ?, ?, ?, ?)",
+            (session["user_id"], blood_group, units, request_date, "Pending")
+        )
+        conn.commit()
+        conn.close()
+
+        flash("✅ Blood request submitted successfully!", "success")
+        return redirect(url_for("my_requests"))
+
+    return render_template("request_blood.html")
+
+
+# ---------- VIEW MY BLOOD REQUESTS ----------
+@app.route("/my-requests")
+@login_required
+def my_requests():
+    conn = get_db()
+    # Assuming you have a 'status' column in blood_requests table
+    user_requests = conn.execute(
+        "SELECT * FROM blood_requests WHERE donor_id = ? ORDER BY request_date DESC",
+        (session["user_id"],)
+    ).fetchall()
+    conn.close()
+    return render_template("my_requests.html", requests=user_requests)
 
 
 
 # ---------- START SERVER ----------
 if __name__ == "__main__":
     app.run(debug=True, port=1234)
-

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    {% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>My Blood Requests</h2>
+
+    <table class="table table-bordered mt-3">
+        <thead>
+            <tr>
+                <th>Blood Group</th>
+                <th>Units</th>
+                <th>Date</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in requests %}
+            <tr>
+                <td>{{ r['blood_group'] }}</td>
+                <td>{{ r['units'] }}</td>
+                <td>{{ r['request_date'] }}</td>
+                <td>
+                    {% if r['status'] == "Approved" %}
+                        <span class="badge text-bg-success">Approved</span>
+                    {% elif r['status'] == "Rejected" %}
+                        <span class="badge text-bg-danger">Rejected</span>
+                    {% else %}
+                        <span class="badge text-bg-warning">Pending</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+
+</body>
+</html>

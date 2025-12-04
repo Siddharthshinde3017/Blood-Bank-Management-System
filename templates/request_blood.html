@@ -1,45 +1,39 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    {% extends "base.html" %}
+{% extends "base.html" %}
+
 {% block content %}
-<div class="container mt-4">
-    <h2>My Blood Requests</h2>
-    <table class="table table-bordered mt-3">
-        <thead>
-            <tr>
-                <th>Blood Group</th>
-                <th>Units</th>
-                <th>Date</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for r in requests %}
-            <tr>
-                <td>{{ r['blood_group'] }}</td>
-                <td>{{ r['units'] }}</td>
-                <td>{{ r['request_date'] }}</td>
-                <td>
-                    {% if r['status'] == "Approved" %}
-                        <span class="badge text-bg-success">Approved</span>
-                    {% elif r['status'] == "Rejected" %}
-                        <span class="badge text-bg-danger">Rejected</span>
-                    {% else %}
-                        <span class="badge text-bg-warning">Pending</span>
-                    {% endif %}
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<div class="container mt-5">
+    <h2 class="mb-4">Request Blood</h2>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form action="{{ url_for('request_blood') }}" method="POST">
+                <div class="mb-3">
+                    <label for="blood_group" class="form-label">Blood Group</label>
+                    <select name="blood_group" id="blood_group" class="form-select" required>
+                        <option value="" selected disabled>Select Blood Group</option>
+                        <option value="A+">A+</option>
+                        <option value="A-">A-</option>
+                        <option value="B+">B+</option>
+                        <option value="B-">B-</option>
+                        <option value="O+">O+</option>
+                        <option value="O-">O-</option>
+                        <option value="AB+">AB+</option>
+                        <option value="AB-">AB-</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="units" class="form-label">Units Required</label>
+                    <input type="number" name="units" id="units" class="form-control" min="1" required>
+                </div>
+
+                <button type="submit" class="btn btn-danger">Submit Request</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <a href="{{ url_for('my_requests') }}" class="btn btn-secondary">View My Requests</a>
+    </div>
 </div>
 {% endblock %}
-
-</body>
-</html>
