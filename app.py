@@ -10,9 +10,15 @@ app.secret_key = "bloodbank_secret_key"   # session secret key
 
 # ---------- DATABASE CONNECTION ----------
 def get_db():
-    conn = sqlite3.connect("blood_bank.db")
+    import os
+    
+    db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "blood_bank.db")
+    print("🔥 Flask is using this database:", db_path)
+
+    conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
     return conn
+
 
 
 # ---------- HOME PAGE ----------
@@ -116,7 +122,7 @@ def donate():
         donation_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         conn = get_db()
         conn.execute(
-            "INSERT INTO donation_history(donor_id, donation_date, units, location) VALUES(?,?,?,?)",
+            "INSERT INTO donation_history(donar_id, donation_date, units, location) VALUES(?,?,?,?)",
             (session["user_id"], donation_date, units, location)
         )
         # Optional: update last_donation in donors table
